@@ -8,6 +8,8 @@ from ckanext.ldm_schema import validation
 from ckanext.ldm_schema.tib_resource_autoupdate import *
 from ckanext.ldm_schema.tib_services import update_service_dataset_relationship, add_service_data_to_dataset_show
 
+from flask import Blueprint, request, jsonify
+
 STOP_UPDATE = True
 
 log = logging.getLogger(__name__)
