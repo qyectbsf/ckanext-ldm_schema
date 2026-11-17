@@ -44,3 +44,9 @@ sections_js:
   output: ckanext-ldm_schema/%(version)s_scheming-sections.js
   contents:
     - js/scheming-sections.js
+
+umls_autocomplete_js:
+  filter: rjsmin
+  output: ckanext-ldm_schema/%(version)s_umls_autocomplete.js
+  contents:
+    - js/umls_autocomplete.js

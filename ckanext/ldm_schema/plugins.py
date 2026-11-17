@@ -59,6 +59,7 @@ def get_paper_link_by_doi(doi):
 
 
 class LDMSchemaPlugin(p.SingletonPlugin):
+    p.implements(p.IBlueprint)
     p.implements(p.IConfigurer, inherit=True)
     p.implements(p.IValidators)
     p.implements(p.ITemplateHelpers)
@@ -135,6 +136,42 @@ class LDMSchemaPlugin(p.SingletonPlugin):
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_resource('assets', 'ckanext-ldm_schema')
+
+    # --- IBlueprint ---
+    def get_blueprint(self):
+        blueprint = Blueprint('umls_proxy', __name__)
+
+        @blueprint.route('/api/umls/search')
+        def umls_search():
+            term = request.args.get('q', '')
+            if not term or len(term) < 3:
+                return jsonify([])
+
+            # Get the API key from environment/config
+            api_key = toolkit.config.get('ckan.umls.api_key')
+            if not api_key:
+                return jsonify([{"label": "Error: UMLS API key missing", "cui": ""}])
+
+            # Query UMLS
+            umls_url = f"https://uts-ws.nlm.nih.gov/rest/search/current?string={term}&apiKey={api_key}"
+
+            try:
+                response = requests.get(umls_url)
+                response.raise_for_status()
+                data = response.json()
+
+                results = []
+                for item in data.get('result', {}).get('results', []):
+                    results.append({
+                        "label": f"{item['name']} ({item['ui']})",
+                        "value": item['name'],
+                        "cui": item['ui']
+                    })
+                return jsonify(results)
+            except Exception as e:
+                return jsonify([{"label": f"API Error: {str(e)}", "cui": ""}])
+
+        return blueprint
 
     # IValidators
     def get_validators(self):

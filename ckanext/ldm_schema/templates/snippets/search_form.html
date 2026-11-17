@@ -1,4 +1,6 @@
 {% ckan_extends %}
+{# Load the JS bundle defined in webassets.yml #}
+{% asset 'ckanext-ldm_schema/umls_autocomplete_js' %}
 
 {% if placeholder: %}
   {% set placeholder = _(placeholder.replace('vdatasets', 'imported datasets')) %}
