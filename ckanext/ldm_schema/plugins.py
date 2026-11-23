@@ -1,3 +1,5 @@
+import os
+
 import ckan.model as model
 import ckan.plugins as p
 import ckan.plugins.toolkit as toolkit
@@ -150,7 +152,10 @@ class LDMSchemaPlugin(p.SingletonPlugin):
                 return jsonify([])
 
             # Get the API key from environment/config
-            api_key = toolkit.config.get('ckan.umls.api_key')
+            api_key = os.environ.get('CKAN__UMLS__API_KEY')
+
+            print("find_me", api_key)
+
             if not api_key:
                 return jsonify([{"label": "Error: UMLS API key missing", "cui": ""}])
 
